@@ -1,0 +1,90 @@
+{
+  "realm": "fleet",
+  "enabled": true,
+  "sslRequired": "external",
+  "bruteForceProtected": true,
+  "passwordPolicy": "length(8)",
+  "accessTokenLifespan": 300,
+  "roles": {
+    "realm": [
+      { "name": "viewer", "description": "Read-only access to devices, telemetry, and alerts" },
+      { "name": "operator", "description": "Operational control: acknowledge alerts, register devices" },
+      {
+        "name": "admin",
+        "description": "Administrator: full fleet and system control",
+        "composite": true,
+        "composites": { "realm": ["operator", "viewer"] }
+      }
+    ]
+  },
+  "groups": [
+    { "name": "Viewers", "path": "/Viewers", "realmRoles": ["viewer"] },
+    { "name": "Operators", "path": "/Operators", "realmRoles": ["operator"] },
+    { "name": "Administrators", "path": "/Administrators", "realmRoles": ["admin"] }
+  ],
+  "clients": [
+    {
+      "clientId": "fleet-portal",
+      "name": "GeoPulse Fleet Portal (SPA)",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "redirectUris": ["http://localhost:3000/*"],
+      "webOrigins": ["http://localhost:3000"],
+      "attributes": { "pkce.code.challenge.method": "S256", "post.logout.redirect.uris": "http://localhost:3000/*" },
+      "protocolMappers": [
+        {
+          "name": "audience-fleet-api",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": { "included.custom.audience": "fleet-api", "access.token.claim": "true", "id.token.claim": "false" }
+        }
+      ]
+    },
+    {
+      "clientId": "fleet-cli",
+      "name": "DEMO ONLY: password grant for scripts — disable outside local dev",
+      "publicClient": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "protocolMappers": [
+        {
+          "name": "audience-fleet-api",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": { "included.custom.audience": "fleet-api", "access.token.claim": "true", "id.token.claim": "false" }
+        }
+      ]
+    },
+    {
+      "clientId": "fleet-api",
+      "name": "Audience for all GeoPulse resource servers",
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "implicitFlowEnabled": false
+    }
+  ],
+  "users": [
+    {
+      "id": "00000000-0000-0000-0000-000000000001", "username": "viewer", "enabled": true,
+      "email": "viewer@example.test", "emailVerified": true, "firstName": "Vic", "lastName": "Viewer",
+      "credentials": [{ "type": "password", "value": "demo1234", "temporary": false }],
+      "groups": ["/Viewers"]
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000002", "username": "operator", "enabled": true,
+      "email": "operator@example.test", "emailVerified": true, "firstName": "Ollie", "lastName": "Operator",
+      "credentials": [{ "type": "password", "value": "demo1234", "temporary": false }],
+      "groups": ["/Operators"]
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000003", "username": "admin", "enabled": true,
+      "email": "admin@example.test", "emailVerified": true, "firstName": "Alice", "lastName": "Admin",
+      "credentials": [{ "type": "password", "value": "demo1234", "temporary": false }],
+      "groups": ["/Administrators"]
+    }
+  ]
+}

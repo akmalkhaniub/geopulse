@@ -1,0 +1,44 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: alert-service
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/fleet}
+    username: ${DB_USER:fleet}
+    password: ${DB_PASSWORD:fleet}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP:localhost:9092}
+    consumer:
+      group-id: alert-service
+      auto-offset-reset: earliest
+    producer:
+      acks: all
+
+geopulse:
+  security:
+    issuer-uri: ${KEYCLOAK_ISSUER:http://localhost:8180/realms/fleet}
+    jwk-set-uri: ${KEYCLOAK_JWKS:http://localhost:8180/realms/fleet/protocol/openid-connect/certs}
+    audience: fleet-api
+  alerts:
+    offline-check-interval-ms: 60000
+    offline-threshold-seconds: 600
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true

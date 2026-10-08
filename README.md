@@ -65,6 +65,43 @@ GPS Devices ──MQTT/LWT──▶ ingestion-service ──telemetry.raw──�
 
 ---
 
+## 🚀 Quick Start & Local Development
+
+### 1. Build and Test the Complete Suite
+```bash
+mvn clean verify
+```
+
+### 2. Launch Supporting Infrastructure
+```bash
+docker compose up -d
+```
+Services spun up:
+- MySQL (`3306`) with database `fleet`
+- Redis (`6379`)
+- Apache Kafka KRaft (`9092`)
+- Eclipse Mosquitto MQTT (`1883`)
+- Keycloak 26.x (`8180`) pre-configured with realm `fleet` and users `admin`, `operator`, `viewer`
+
+### 3. Generate a Keycloak Bearer Token
+```bash
+# Linux/macOS
+./scripts/get-token.sh admin demo1234
+
+# Windows PowerShell
+.\scripts\get-token.ps1 -User admin -Password demo1234
+```
+
+### 4. Run the Device Simulator
+Publishes realistic GPS tracks with speed, heading, battery drain, and LWT to the local MQTT broker:
+```bash
+pip install paho-mqtt
+python scripts/simulate_devices.py --count 10
+```
+
+---
+
 ## 📖 Implementation Guide
 
 The full specification, schema definitions, Kafka topic layouts, and phased build sequence are documented in [`SPEC.md`](SPEC.md).
+
